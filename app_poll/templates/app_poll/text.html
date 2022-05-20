@@ -1,0 +1,22 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Вопрос с вводом ответа текстом{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Введите в поле ваш ответ на вопрос - "{{ question }}":</h1>
+    <br>
+    <form method="post" enctype="multipart/form-data" action="{% url 'poll:text_answer' question.pk %}">
+    {% csrf_token %}
+    {{ form|crispy  }}
+    <br>
+    <input type="submit" class="btn btn-info mb-2" value="Подтвердить ответ">
+    </form>
+{% endblock %}

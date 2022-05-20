@@ -22,5 +22,6 @@ handler500 = custom_handler500
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('accounts.urls')),
     path('', include('app_poll.urls')),
 ]

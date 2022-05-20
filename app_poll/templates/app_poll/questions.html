@@ -1,0 +1,29 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Домашняя страница{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Все вопросы, относящиеся к опросу - "{{ vote }}":</h1>
+    <br>
+    {% for question in questions %}
+            {% if question.type_question == 'one_choice' %}
+                <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
+                <h2><a href="{% url 'poll:variant' question.pk %}">{{ question.text }}</a></h2>
+            {% elif question.type_question == 'text' %}
+                <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
+                <h2><a href="{% url 'poll:text_answer' question.pk %}">{{ question.text }}</a></h2>
+            {% else %}
+                <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
+                <h2><a href="#">{{ question.text }}</a></h2>
+            {% endif %}
+            <br>
+    {% endfor %}
+{% endblock %}

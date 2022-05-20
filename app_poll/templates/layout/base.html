@@ -13,10 +13,36 @@
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 {% block css %}{% endblock %}
 </head>
+            {% if user.is_authenticated %}
+
+              <form action="{% url 'accounts:logout' %}?next=/" method="POST">
+                {% csrf_token %}
+                {{ form.id_vote }}
+                  <br>
+                  <input type="submit" class="btn btn-info mb-2" value="Выйти">
+              </form>
+
+                <form action="{% url 'poll:vote' %}" method="get">
+                <input type="submit" class="btn btn-info mb-2" value="На главную">
+                </form>
+
+                <form action="{{ request.META.HTTP_REFERER }}" method="get">
+                <input type="submit" class="btn btn-info mb-2" value="Назад">
+                </form>
+            {% else %}
+            <br>
+            <form action="{% url 'accounts:login' %}" method="get">
+                <input type="submit" class="btn btn-info mb-2" value="Вход">
+                </form>
+            {% endif %}
+
 <body class="container-fluid">
     <header class="mb-4">
         <h1 class="display-1 text-center">Опросник</h1>
     </header>
+    <br>
+    <br>
+
   {% block content %}
   {% endblock %}
 </body>

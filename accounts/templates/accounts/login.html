@@ -1,0 +1,29 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Вход{% endblock %}
+
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<h4 class="text-center">Войдите, чтобы управлять</h4>
+
+    <form method="post" class="text-center">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {{ form|crispy }}
+        <br>
+        <input type="submit" class="btn btn-info mb-2" value="Войти">
+    </form>
+
+
+<p align="center">Нет аккаунта? <a href="{% url 'accounts:signup' %}">Зарегистрируйтесь!</a></p>
+{% endblock %}

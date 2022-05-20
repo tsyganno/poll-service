@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 
 class Vote(models.Model):
     title = models.CharField(max_length=50, verbose_name='Опрос')
-    published = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Открытие опроса')
-    published_of = models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Закрытие опроса')
+    published = models.DateTimeField(db_index=True, verbose_name='Открытие опроса')
+    published_off = models.DateTimeField(db_index=True, verbose_name='Закрытие опроса')
     content = models.TextField(null=True, blank=True, verbose_name='Описание')
 
     def __str__(self):
@@ -24,16 +24,17 @@ class Question(models.Model):
         ('one_choice', 'Ответ с выбором одного варианта'),
         ('some_choices', 'Ответ с выбором нескольких вариантов'),
     )
-    name = models.CharField(max_length=50, choices=TYPE, verbose_name='Вопрос')
+    type_question = models.CharField(max_length=50, choices=TYPE, verbose_name='Тип вопроса')
+    text = models.CharField(max_length=100, verbose_name='Вопрос')
     correct_answer = models.CharField(max_length=50, verbose_name='Правильный ответ')
 
     def __str__(self):
-        return self.name
+        return self.text
 
     class Meta:
         verbose_name_plural = 'Вопросы'
         verbose_name = 'Вопрос'
-        ordering = ['name']
+        ordering = ['text']
 
 
 class Variant(models.Model):
@@ -50,7 +51,7 @@ class Variant(models.Model):
 
 
 class Answer(models.Model):
-    answer = models.IntegerField(verbose_name='Ответ')
+    answer = models.CharField(max_length=50, verbose_name='Ответ пользователя')
     question = models.ForeignKey('Question', null=True, on_delete=models.PROTECT, verbose_name='Вопрос')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="answer", verbose_name='Пользователь')
 

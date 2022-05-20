@@ -1,0 +1,23 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Регистрация{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<h4 class="text-center">Создайте аккаунт</h4>
+<form method="post" class="text-center">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <input type="submit" class="btn btn-info mb-2" value="Зарегистрироваться">
+</form>
+
+{% endblock %}
