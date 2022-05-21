@@ -13,27 +13,51 @@
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 {% block css %}{% endblock %}
 </head>
+
+<header class="container mt-3">
+    <nav class="navbar navbar-expand-lg navbar-blue">
+      <a class="navbar-brand mr-4 font-weight-bold" href="{% url 'poll:vote' %}">Опросник</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
+        <ul class="navbar-nav col-10"></ul>
+        <ul class="navbar-nav col-2 justify-content-end">
+          <li class="nav-item active">
+
+
             {% if user.is_authenticated %}
 
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                 aria-expanded="false">{{ user.first_name }} {{ user.last_name }}</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="{% url 'poll:vote' %}">Опросы</a>
+                <a class="dropdown-item" href="{% url 'poll:outcome' user.pk %}">Результаты</a>
               <form action="{% url 'accounts:logout' %}?next=/" method="POST">
                 {% csrf_token %}
                 {{ form.id_vote }}
-                  <br>
-                  <input type="submit" class="btn btn-info mb-2" value="Выйти">
+                <button class="dropdown-item" type="submit">Выйти</button>
               </form>
+              </div>
+            </li>
 
-                <form action="{% url 'poll:vote' %}" method="get">
-                <input type="submit" class="btn btn-info mb-2" value="На главную">
-                </form>
+            {% else %}
+                <a href="{% url 'accounts:login' %}" class="nav-link font-weight-bold">Вход</a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </header>
+
+            {% if user.is_authenticated %}
 
                 <form action="{{ request.META.HTTP_REFERER }}" method="get">
                 <input type="submit" class="btn btn-info mb-2" value="Назад">
                 </form>
-            {% else %}
-            <br>
-            <form action="{% url 'accounts:login' %}" method="get">
-                <input type="submit" class="btn btn-info mb-2" value="Вход">
-                </form>
+
             {% endif %}
 
 <body class="container-fluid">

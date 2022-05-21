@@ -1,0 +1,22 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Вопрос с одним вариантом ответа{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Итоги прохождения опросов:</h1>
+
+    {% for key, value in dict.items %}
+        <h5>Вопрос: {{ key }}</h5>
+        <p>{{ value }}</p>
+    {% endfor %}
+    <h5>Количество правильных ответов: {{ count }} из {{ count_2 }} </h5>
+
+{% endblock %}

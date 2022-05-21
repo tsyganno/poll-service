@@ -22,7 +22,7 @@ body {
                 <h2><a href="{% url 'poll:text_answer' question.pk %}">{{ question.text }}</a></h2>
             {% else %}
                 <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
-                <h2><a href="#">{{ question.text }}</a></h2>
+                <h2><a href="{% url 'poll:some_variant' question.pk %}">{{ question.text }}</a></h2>
             {% endif %}
             <br>
     {% endfor %}

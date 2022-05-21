@@ -1,0 +1,31 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Вопрос с одним вариантом ответа{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Варианты ответов к вопросу - "{{ question }}":</h1>
+    <br>
+
+        <form method="post" action="{% url 'poll:result_some_variant' question.pk %}">
+        {% csrf_token %}
+
+            {% for variant in variants %}
+
+            <input type="checkbox" id="{{ variant.id }}" name="variantid" value="{{ variant.pk }}">
+            <label for="{{ variant.id }}"> {{ variant.name_variant }} </label><br>
+
+        <br>
+            {% endfor %}
+            <input type="submit" class="btn btn-info mb-2" value="Подтвердить ответ">
+        </form>
+
+
+{% endblock %}
