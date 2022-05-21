@@ -20,7 +20,7 @@ class Vote(models.Model):
 class Question(models.Model):
     vote = models.ForeignKey('Vote', null=True, on_delete=models.CASCADE, verbose_name='Опрос')
     TYPE = (
-        ('text', 'Ввод ответа текстом'),
+        ('text', 'Ответ вводом текста'),
         ('one_choice', 'Ответ с выбором одного варианта'),
         ('some_choices', 'Ответ с выбором нескольких вариантов'),
     )

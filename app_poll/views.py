@@ -24,13 +24,28 @@ def custom_handler500(request):
     return HttpResponseServerError('Ошибка сервера!')
 
 
+class QuestionByTypeView(LoginRequiredMixin, TemplateView):
+    login_url = 'accounts:login'
+    template_name = 'app_poll/question_by_type.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['questions'] = Question.objects.filter(type_question=self.kwargs['type'], vote__id=self.kwargs['pk'])
+        context['vote'] = Vote.objects.get(id=self.kwargs['pk'])
+        context['type'] = Question.objects.filter(type_question=self.kwargs['type']).first()
+        return context
+
+
 class QuestionView(LoginRequiredMixin, TemplateView):
     login_url = 'accounts:login'
     template_name = 'app_poll/questions.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['questions'] = Question.objects.filter(vote__id=self.kwargs['pk'])
+        type_question_set = set()
+        for el in Question.objects.filter(vote__id=self.kwargs['pk']):
+            type_question_set.add(el.type_question)
+        context['types'] = type_question_set
         context['vote'] = Vote.objects.get(id=self.kwargs['pk'])
         return context
 

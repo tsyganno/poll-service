@@ -1,6 +1,6 @@
 {% extends "layout/base.html" %}
 {% load crispy_forms_tags %}
-{% block title %}Домашняя страница{% endblock %}
+{% block title %}Вопросы по типу{% endblock %}
 
 {% block css %}
 <style>
@@ -11,18 +11,16 @@ body {
 {% endblock %}
 
 {% block content %}
-<h1>Все вопросы, относящиеся к опросу - "{{ vote }}":</h1>
+<h1>Все вопросы, относящиеся к опросу - "{{ vote }}".</h1>
+<h1>Выберите вопросы по типу:</h1>
     <br>
-    {% for question in questions %}
-            {% if question.type_question == 'one_choice' %}
-                <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
-                <h2><a href="{% url 'poll:variant' question.pk %}">{{ question.text }}</a></h2>
-            {% elif question.type_question == 'text' %}
-                <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
-                <h2><a href="{% url 'poll:text_answer' question.pk %}">{{ question.text }}</a></h2>
+    {% for type in types %}
+            {% if type == 'one_choice' %}
+                <h2><a href="{% url 'poll:question_by_type' vote.pk type %}">Ответ с выбором одного варианта</a></h2>
+            {% elif type == 'text' %}
+                <h2><a href="{% url 'poll:question_by_type' vote.pk type %}">Ответ вводом текста</a></h2>
             {% else %}
-                <h4>Тип вопроса - {{ question.get_type_question_display }}</h4>
-                <h2><a href="{% url 'poll:some_variant' question.pk %}">{{ question.text }}</a></h2>
+                <h2><a href="{% url 'poll:question_by_type' vote.pk type %}">Ответ с выбором нескольких вариантов</a></h2>
             {% endif %}
             <br>
     {% endfor %}

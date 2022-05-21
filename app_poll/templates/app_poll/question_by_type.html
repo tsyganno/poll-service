@@ -1,0 +1,26 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Вопросы{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Опрос - "{{ vote }}". Тип вопроса - {{ type.get_type_question_display }}</h1>
+    <br>
+    {% for question in questions %}
+            {% if question.type_question == 'one_choice' %}
+                <h2><a href="{% url 'poll:variant' question.pk %}">{{ question.text }}</a></h2>
+            {% elif question.type_question == 'text' %}
+                <h2><a href="{% url 'poll:text_answer' question.pk %}">{{ question.text }}</a></h2>
+            {% else %}
+                <h2><a href="{% url 'poll:some_variant' question.pk %}">{{ question.text }}</a></h2>
+            {% endif %}
+            <br>
+    {% endfor %}
+{% endblock %}
