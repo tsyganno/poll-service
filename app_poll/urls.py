@@ -1,6 +1,6 @@
 from django.urls import path
 from app_poll.views import IndexView, VoteView, QuestionView, VariantView, TextAnswerView, record_to_model_one_answer, \
-    SomeVariantView, record_to_model_some_answers, OutcomeView, QuestionByTypeView
+    SomeVariantView, record_to_model_some_answers, OutcomeView, QuestionByTypeView, DeleteAnswerView
 
 
 app_name = 'poll'
@@ -15,4 +15,5 @@ urlpatterns = [
     path('votes/some_answers_question/result/<int:pk>/', record_to_model_some_answers, name='result_some_variant'),
     path('votes/text_one_answer_question/<int:pk>/', TextAnswerView.as_view(), name='text_answer'),
     path('outcome/<int:pk>/', OutcomeView.as_view(), name='outcome'),
+    path('delete/<int:pk>/', DeleteAnswerView.as_view(), name='delete'),
 ]

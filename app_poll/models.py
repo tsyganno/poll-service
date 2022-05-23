@@ -52,6 +52,7 @@ class Variant(models.Model):
 
 class Answer(models.Model):
     answer = models.CharField(max_length=50, verbose_name='Ответ пользователя')
+    date_of_answer = models.DateTimeField(auto_now=True, db_index=True, verbose_name='Дата и время ответа')
     question = models.ForeignKey('Question', null=True, on_delete=models.PROTECT, verbose_name='Вопрос')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="answer", verbose_name='Пользователь')
 

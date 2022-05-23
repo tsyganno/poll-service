@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponseNotFound, HttpResponseServerError, HttpResponseRedirect
 from django.views.generic.base import TemplateView
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, UpdateView
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import CreateView
@@ -82,8 +82,9 @@ class TextAnswerView(LoginRequiredMixin, CreateView):
         return super(TextAnswerView, self).form_valid(form)
 
     def get_success_url(self):
-        question = Question.objects.get(id=self.kwargs['pk'])
-        return reverse('poll:question', kwargs={'pk': question.pk})
+        num = Question.objects.get(id=self.kwargs['pk']).id
+        vote_pk = Vote.objects.filter(question__id=num).first().id
+        return reverse('poll:question', kwargs={'pk': vote_pk})
 
 
 class VariantView(LoginRequiredMixin, TemplateView):
@@ -146,39 +147,46 @@ class OutcomeView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         answers_user = Answer.objects.filter(user__id=self.kwargs['pk'])
-        questions = Question.objects.all()
         questions_answers = {}
         count = 0
-        count_questions = 1
-        for question in questions:
-            for answer in answers_user:
-                if question.pk == answer.question.pk:
-                    if question.type_question != 'some_choices':
-                        if str(question.correct_answer).lower() == str(answer.answer).lower():
-                            count += 1
-                            if question.text not in questions_answers:
-                                questions_answers[question.text] = f'Правилный ответ: {str(question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
-                            else:
-                                count_questions += 1
-                                questions_answers[f'{question.text} Попытка №{count_questions}.'] = f'Правилный ответ: {str(question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
-                        else:
-                            if question.text not in questions_answers:
-                                questions_answers[question.text] = f'Правилный ответ: {str(question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
-                            else:
-                                count_questions += 1
-                                questions_answers[f'{question.text} Попытка №{count_questions}.'] = f'Правилный ответ: {str(question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
-                    else:
-                        counter = 0
-                        question_list = list(map(lambda x: x.lower(), str(question.correct_answer).split()))
-                        answer_list = list(map(lambda x: x.lower(), str(answer.answer).split()))
-                        for el in answer_list:
-                            if el in question_list:
-                                counter += 1
-                        if counter == len(question_list):
-                            count += 1
-                            questions_answers[question.text] = f'Правилный ответ: {str(question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
-                        else:
-                            questions_answers[question.text] = f'Правилный ответ: {str(question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
+        for answer in answers_user:
+            if answer.question.type_question != 'some_choices':
+                if str(answer.question.correct_answer).lower() == str(answer.answer).lower():
+                    count += 1
+                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
+                else:
+                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
+            else:
+                counter = 0
+                question_list = list(map(lambda x: x.lower(), str(answer.question.correct_answer).split()))
+                answer_list = list(map(lambda x: x.lower(), str(answer.answer).split()))
+                for el in answer_list:
+                    if el in question_list:
+                        counter += 1
+                if counter == len(question_list):
+                    count += 1
+                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
+                else:
+                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
         return self.render_to_response({'dict': questions_answers, 'count': count, 'count_2': len(answers_user)})
 
 
+class DeleteAnswerView(LoginRequiredMixin, DeleteView):
+    login_url = 'accounts:login'
+    template_name = 'app_poll/delete_answer.html'
+    model = Answer
+
+    def get_queryset(self):
+        owner = self.request.user.pk
+        return self.model.objects.filter(user__id=owner)
+
+    def get_object(self, queryset=None):
+        return self.get_queryset()
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['answers'] = Answer.objects.filter(user__id=self.kwargs['pk'])
+        return context
+
+    def get_success_url(self):
+        return reverse('poll:vote')

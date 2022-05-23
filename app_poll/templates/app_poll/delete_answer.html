@@ -1,0 +1,25 @@
+{% extends "layout/base.html" %}
+{% load crispy_forms_tags %}
+{% block title %}Вопросы по типу{% endblock %}
+
+{% block css %}
+<style>
+body {
+      background-color: #F6F2E6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Вы действительно хотите удалить следующие данные? После удаления вы окажетесь на странице с опросами.</h1>
+    <br>
+    {% for answer in answers %}
+        <h3>Вопрос: {{ answer.question.text }} Ваш ответ: {{ answer.answer }}</h3>
+    {% endfor %}
+    <form method="post">
+    {% csrf_token %}
+    {{ form|crispy  }}
+    <br>
+    <input type="submit" class="btn btn-info mb-2" value="Подтвердить удаление">
+    </form>
+{% endblock %}
