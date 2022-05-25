@@ -23,6 +23,3 @@ class AnswerForm(forms.ModelForm):
             ),
             ButtonHolder(Submit('submit', 'Перейти к выбору опросов'))
         )
-
-
-

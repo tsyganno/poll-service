@@ -63,4 +63,3 @@ class Answer(models.Model):
         verbose_name_plural = 'Ответы'
         verbose_name = 'Ответ'
         ordering = ['answer']
-

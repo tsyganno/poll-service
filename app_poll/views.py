@@ -1,17 +1,11 @@
-from django.shortcuts import render, redirect, reverse
+from datetime import datetime
+from django.shortcuts import reverse
 from django.http import HttpResponseNotFound, HttpResponseServerError, HttpResponseRedirect
 from django.views.generic.base import TemplateView
-from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, UpdateView, DeleteView
+from django.views.generic import DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import CreateView
-from django import forms
-import requests
-from django.contrib.auth.models import User
-from django.db import IntegrityError
 from app_poll.forms import AnswerForm
-from django.urls import reverse_lazy
 
 from app_poll.models import Vote, Question, Variant, Answer
 
@@ -56,7 +50,8 @@ class VoteView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['votes'] = Vote.objects.all()
+        time_now = datetime.now()
+        context['votes'] = Vote.objects.filter(published_off__gt=time_now, published__lt=time_now)
         return context
 
 
@@ -150,12 +145,17 @@ class OutcomeView(LoginRequiredMixin, TemplateView):
         questions_answers = {}
         count = 0
         for answer in answers_user:
+            key = f'{answer.question.text} Дата и время попытки: ' \
+                  f'{str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'
             if answer.question.type_question != 'some_choices':
                 if str(answer.question.correct_answer).lower() == str(answer.answer).lower():
                     count += 1
-                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
+                    questions_answers[key] = f'Правилный ответ: {str(answer.question.correct_answer)}, ' \
+                                             f'а ваш ответ: {str(answer.answer)}. ' \
+                                             f'Вы ответили правильно и получаете: +1 балл.'
                 else:
-                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
+                    questions_answers[key] = f'Правилный ответ: {str(answer.question.correct_answer)}, ' \
+                                             f'а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
             else:
                 counter = 0
                 question_list = list(map(lambda x: x.lower(), str(answer.question.correct_answer).split()))
@@ -165,9 +165,12 @@ class OutcomeView(LoginRequiredMixin, TemplateView):
                         counter += 1
                 if counter == len(question_list):
                     count += 1
-                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили правильно и получаете: +1 балл.'
+                    questions_answers[key] = f'Правилный ответ: {str(answer.question.correct_answer)}, ' \
+                                             f'а ваш ответ: {str(answer.answer)}. ' \
+                                             f'Вы ответили правильно и получаете: +1 балл.'
                 else:
-                    questions_answers[f'{answer.question.text} Дата и время попытки: {str(answer.date_of_answer)[:str(answer.date_of_answer).find(".")]}.'] = f'Правилный ответ: {str(answer.question.correct_answer)}, а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
+                    questions_answers[key] = f'Правилный ответ: {str(answer.question.correct_answer)}, ' \
+                                             f'а ваш ответ: {str(answer.answer)}. Вы ответили неправильно.'
         return self.render_to_response({'dict': questions_answers, 'count': count, 'count_2': len(answers_user)})
 
 
