@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import find_dotenv, load_dotenv
+from os import getenv
+
+load_dotenv(find_dotenv())
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,7 @@ SECRET_KEY = 'django-insecure-8!$!n*1&12%yz6dn)ehfdi5!4qc7$_$6e38up=ydnzmt)!(aov
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -77,13 +81,22 @@ WSGI_APPLICATION = 'conf.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+POSTGRESQL_HOST = getenv('POSTGRESQL_HOST')
+POSTGRESQL_DATABASE = getenv('POSTGRESQL_DATABASE')
+POSTGRESQL_USER = getenv('POSTGRESQL_USER')
+POSTGRESQL_PASSWORD = getenv('POSTGRESQL_PASSWORD')
+POSTGRESQL_PORT = getenv('POSTGRESQL_PORT')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': POSTGRESQL_DATABASE,
+        'USER': POSTGRESQL_USER,
+        'PASSWORD': POSTGRESQL_PASSWORD,
+        'HOST': POSTGRESQL_HOST,
+        'PORT': POSTGRESQL_PORT,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
